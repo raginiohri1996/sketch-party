@@ -50,12 +50,10 @@ export function HomeScreen({ online }: { online: number | null }) {
       </header>
 
       <main className="home__main">
-        <section className="card hero">
+        <section className="glass glass--clear hero">
           <div className="hero__head">
-            <p className="eyebrow">Player setup</p>
-            <h1 className="hero__title">
-              Clock in. Draw badly. <span className="hl">Win anyway.</span>
-            </h1>
+            <h1 className="hero__title">Clock in. Draw badly. Win anyway.</h1>
+            <p className="hero__sub">Make your player, then grab a seat when rooms open.</p>
           </div>
 
           <AvatarStage ref={stage} config={profile.avatar} name={check.ok ? check.name : undefined} />

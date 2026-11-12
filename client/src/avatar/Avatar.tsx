@@ -137,7 +137,8 @@ function buildParts(cfg: AvatarConfig, uid: string): Part[] {
       node: <path d="M -29.6 -158 C -31 -191 31 -191 29.6 -158 Q 0 -174 -29.6 -158 Z" {...hairProps} opacity={cfg.hair === "buzz" ? 0.92 : 1} />,
     });
   }
-  if (hair.front) parts.push({ key: "hairFront", x0: 0, z: 28.5, flat: "hair", node: <g {...hairProps}>{hair.front}</g> });
+  // Hair sits close to the skull, so it slides less than the face; the bias keeps it drawn over the forehead.
+  if (hair.front) parts.push({ key: "hairFront", x0: 0, z: 14, bias: 14.5, flat: "hair", node: <g {...hairProps}>{hair.front}</g> });
   if (cfg.hair === "ponytail") {
     parts.push({
       key: "tail",

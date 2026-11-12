@@ -1,27 +1,29 @@
-const ORBS = [
-  { color: "var(--violet)", size: 520, left: 8, top: 12, duration: 28 },
-  { color: "var(--coral)", size: 380, left: 88, top: 18, duration: 34 },
-  { color: "var(--lime)", size: 300, left: 70, top: 92, duration: 30 },
-  { color: "var(--tangerine)", size: 260, left: 22, top: 88, duration: 38 },
+// Vivid light sources behind the glass. Glassmorphism only works when there's
+// strong color behind the panes, so these are bright, big and slow.
+const LIGHTS = [
+  { color: "#7a5cff", size: 620, left: 24, top: 46, duration: 26 }, // behind the avatar
+  { color: "#ff4fd8", size: 440, left: 6, top: 88, duration: 32 },
+  { color: "#3d7bff", size: 560, left: 82, top: 14, duration: 30 },
+  { color: "#ffb547", size: 300, left: 62, top: 96, duration: 36 },
+  { color: "#ff4fd8", size: 260, left: 96, top: 70, duration: 28 },
 ];
 
-/** A few large, soft glowing orbs drifting slowly behind everything. Purely decorative. */
 export function Bubbles() {
   return (
-    <div className="orbs" aria-hidden>
-      {ORBS.map((o, i) => (
+    <div className="lights" aria-hidden>
+      {LIGHTS.map((l, i) => (
         <span
           key={i}
-          className="orb"
+          className="light"
           style={
             {
-              width: o.size,
-              height: o.size,
-              left: `${o.left}%`,
-              top: `${o.top}%`,
-              "--c": o.color,
-              animationDuration: `${o.duration}s`,
-              animationDelay: `${-i * 7}s`,
+              width: l.size,
+              height: l.size,
+              left: `${l.left}%`,
+              top: `${l.top}%`,
+              "--c": l.color,
+              animationDuration: `${l.duration}s`,
+              animationDelay: `${-i * 6}s`,
             } as React.CSSProperties
           }
         />

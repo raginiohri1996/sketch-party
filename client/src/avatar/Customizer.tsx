@@ -32,7 +32,7 @@ export function Customizer({ config, onChange }: Props) {
   const set = <K extends keyof AvatarConfig>(key: K, value: AvatarConfig[K]) => onChange({ ...config, [key]: value });
 
   return (
-    <section className="card customizer" aria-label="Customize your avatar">
+    <section className="glass glass--frost customizer" aria-label="Customize your avatar">
       <div className="tabs" role="tablist">
         {TABS.map((t) => (
           <button key={t.id} role="tab" aria-selected={tab === t.id} className={`tab ${tab === t.id ? "tab--on" : ""}`} onClick={() => setTab(t.id)}>

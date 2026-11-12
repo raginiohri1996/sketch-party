@@ -48,7 +48,7 @@ export const AvatarStage = forwardRef<AvatarStageHandle, { config: AvatarConfig;
         s.angle += s.vel;
         if (Math.abs(s.vel) < 0.4) {
           s.base = Math.round(s.angle / 360) * 360;
-          const sway = reducedMotion() ? 0 : Math.sin((now - start) / 1600) * 18;
+          const sway = reducedMotion() ? 0 : Math.sin((now - start) / 1800) * 10;
           s.angle += (s.base + sway - s.angle) * 0.06;
         }
       }
