@@ -11,8 +11,8 @@ const SPIN_MS = 1700;
 const reducedMotion = () => window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
 
 /** Avatar on a bubbly platform. Drag (or arrow keys) to turn it; it springs back to face you. */
-export const AvatarStage = forwardRef<AvatarStageHandle, { config: AvatarConfig; name?: string }>(function AvatarStage(
-  { config, name },
+export const AvatarStage = forwardRef<AvatarStageHandle, { config: AvatarConfig; name?: string; children?: React.ReactNode }>(function AvatarStage(
+  { config, name, children },
   ref,
 ) {
   const [angle, setAngle] = useState(0);
@@ -110,6 +110,7 @@ export const AvatarStage = forwardRef<AvatarStageHandle, { config: AvatarConfig;
         </div>
       </div>
       <p className="stage__hint">← drag to turn →</p>
+      {children}
     </div>
   );
 });

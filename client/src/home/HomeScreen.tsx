@@ -1,7 +1,7 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { checkName, isValidRoomCode, NAME_MAX, normalizeRoomCode } from "@sketch/shared";
 import { AvatarStage, type AvatarStageHandle } from "../avatar/AvatarStage";
-import { Customizer } from "../avatar/Customizer";
+import { Customizer, PhoneCustomizer } from "../avatar/Customizer";
 import { randomAvatar } from "../avatar/config";
 import type { Profile } from "../profile";
 import type { RoomApi } from "../room/useRoom";
@@ -20,7 +20,23 @@ type Props = {
   room: RoomApi;
 };
 
+/** True on phone-sized screens (same breakpoint as the CSS). */
+function useIsPhone() {
+  const query = "(max-width: 880px)";
+  const [phone, setPhone] = useState(() => window.matchMedia?.(query).matches ?? false);
+  useEffect(() => {
+    const mq = window.matchMedia?.(query);
+    if (!mq) return;
+    const on = () => setPhone(mq.matches);
+    mq.addEventListener("change", on);
+    return () => mq.removeEventListener("change", on);
+  }, []);
+  return phone;
+}
+
 export function HomeScreen({ online, profile, onProfileChange, room }: Props) {
+  const isPhone = useIsPhone();
+  const setAvatar = (avatar: Profile["avatar"]) => onProfileChange((p) => ({ ...p, avatar }));
   const [touched, setTouched] = useState(false);
   const [codeOpen, setCodeOpen] = useState(false);
   const [code, setCode] = useState("");
@@ -60,7 +76,7 @@ export function HomeScreen({ online, profile, onProfileChange, room }: Props) {
   };
 
   return (
-    <div className="home">
+    <div className={`home ${isPhone ? "home--phone" : ""}`}>
       <TopBar online={online} />
 
       <main className="home__main">
@@ -70,7 +86,9 @@ export function HomeScreen({ online, profile, onProfileChange, room }: Props) {
             <p className="hero__sub">{invite ? "Set up your player, then hop in." : "Make your player, then host a game or join one."}</p>
           </div>
 
-          <AvatarStage ref={stage} config={profile.avatar} name={check.ok ? check.name : undefined} />
+          <AvatarStage ref={stage} config={profile.avatar} name={check.ok ? check.name : undefined}>
+            {isPhone && <PhoneCustomizer config={profile.avatar} onChange={setAvatar} />}
+          </AvatarStage>
 
           <div className="hero__actions">
             <button className="btn btn--ghost btn--sm" onClick={() => stage.current?.spin()}>
@@ -162,7 +180,7 @@ export function HomeScreen({ online, profile, onProfileChange, room }: Props) {
           )}
         </section>
 
-        <Customizer config={profile.avatar} onChange={(avatar) => onProfileChange((p) => ({ ...p, avatar }))} />
+        {!isPhone && <Customizer config={profile.avatar} onChange={setAvatar} />}
       </main>
     </div>
   );
