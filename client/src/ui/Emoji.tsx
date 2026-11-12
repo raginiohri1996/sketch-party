@@ -14,7 +14,16 @@ export const EMOJI = {
   Rocket: "🚀",
   "Counterclockwise arrows button": "🔄",
   "Hot beverage": "☕",
-  "Joystick": "🕹️",
+  Joystick: "🕹️",
+  Crown: "👑",
+  Robot: "🤖",
+  Clipboard: "📋",
+  "Check mark button": "✅",
+  "Hourglass not done": "⏳",
+  Trophy: "🏆",
+  "1st place medal": "🥇",
+  "2nd place medal": "🥈",
+  "3rd place medal": "🥉",
 } as const;
 
 export type EmojiName = keyof typeof EMOJI;

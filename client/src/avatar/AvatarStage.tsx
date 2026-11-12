@@ -7,6 +7,7 @@ export interface AvatarStageHandle {
 }
 
 const FRICTION = 0.92;
+const SPIN_MS = 1700;
 const reducedMotion = () => window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
 
 /** Avatar on a bubbly platform. Drag (or arrow keys) to turn it; it springs back to face you. */
@@ -16,11 +17,15 @@ export const AvatarStage = forwardRef<AvatarStageHandle, { config: AvatarConfig;
 ) {
   const [angle, setAngle] = useState(0);
   const [popKey, setPopKey] = useState(0);
-  const sim = useRef({ angle: 0, vel: 0, dragging: false, lastX: 0, base: 0 });
+  const sim = useRef({ angle: 0, vel: 0, dragging: false, lastX: 0, base: 0, spin: null as null | { from: number; to: number; t0: number } });
 
   useImperativeHandle(ref, () => ({
+    // A slow, eased full turn that always ends facing front.
     spin: () => {
-      sim.current.vel = 360 * (1 - FRICTION);
+      const s = sim.current;
+      const from = s.angle;
+      s.vel = 0;
+      s.spin = { from, to: Math.round(from / 360) * 360 + 360, t0: performance.now() };
     },
   }));
 
@@ -43,6 +48,11 @@ export const AvatarStage = forwardRef<AvatarStageHandle, { config: AvatarConfig;
       const s = sim.current;
       if (Number.isFinite(frozen) && window.location.search.includes("angle=")) {
         s.angle = frozen;
+      } else if (s.spin && !s.dragging) {
+        const t = Math.min(1, (now - s.spin.t0) / SPIN_MS);
+        const eased = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; // ease in-out
+        s.angle = s.spin.from + (s.spin.to - s.spin.from) * eased;
+        if (t >= 1) s.spin = null;
       } else if (!s.dragging) {
         s.vel *= FRICTION;
         s.angle += s.vel;
@@ -62,6 +72,7 @@ export const AvatarStage = forwardRef<AvatarStageHandle, { config: AvatarConfig;
   const onPointerDown = (e: React.PointerEvent) => {
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
     sim.current.dragging = true;
+    sim.current.spin = null;
     sim.current.lastX = e.clientX;
     sim.current.vel = 0;
   };

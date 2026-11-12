@@ -1,9 +1,6 @@
-import { randomAvatar, sanitizeAvatar, type AvatarConfig } from "./avatar/config";
+import { randomAvatar, sanitizeAvatar, type Profile } from "@sketch/shared";
 
-export interface Profile {
-  name: string;
-  avatar: AvatarConfig;
-}
+export type { Profile };
 
 const KEY = "sketch-party.profile.v1";
 

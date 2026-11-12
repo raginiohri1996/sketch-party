@@ -1,5 +1,7 @@
 # Sketch-and-Guess Party Game — Build Plan
 
+> **Status (2026-11-12): all V1 phases (0–8) are built.** Deferred ideas (game modes, gallery/GIFs, mobile layout, chat, vote-kick) are listed below for V2.
+
 Working title TBD (avoid "draw.io" — existing product).
 
 **Audience:** friends & office teams (desktop browsers).
@@ -77,6 +79,10 @@ _Changed 2026-11-12: first pass (candy pastels, chibi characters, Fredoka) read 
 - Timer, guess input, correct-guess detection (case/spacing tolerant), speed-based scoring, drawer points
 - Turn → round → game over flow, final scoreboard with avatars
 - **Done when:** a full multi-round game plays start to finish with humans
+
+> **Built 2026-11-12 (Phases 4–6):** pack v1 (179 words) was written by Claude directly into `server/src/wordpack.ts` and validated on load
+> (no clue may contain its answer); sound hints are synthesized in the browser (`client/src/game/sounds.ts`) instead of CC0 files.
+> Sabotage needs 3+ players (with 2, the only guesser getting it right ends the turn). A Claude API regeneration script is optional future work.
 
 ### Phase 4 — Content pipeline (word & hint packs)
 - Script calls the AI once, offline, to build JSON packs: word, category, difficulty, emoji riddle, 3 tiered clues, sound tag, list of "near" words (for the close-guess signal)

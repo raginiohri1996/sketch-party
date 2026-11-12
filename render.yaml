@@ -12,3 +12,7 @@ services:
         value: "22"
       - key: ANTHROPIC_API_KEY
         sync: false
+      - key: AI_MODEL
+        sync: false
+      - key: AI_MAX_CALLS_PER_GAME
+        sync: false
