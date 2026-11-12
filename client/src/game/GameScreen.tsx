@@ -177,6 +177,9 @@ export function GameScreen({ room, myId, api, online }: Props) {
               )}
             </div>
             <div className="stagecard__right">
+              <span className="stagecard__round" aria-label={`Round ${g.round} of ${g.rounds}`}>
+                R{g.round}/{g.rounds}
+              </span>
               {twist && g.phase === "drawing" && (
                 <span className="twist-pill" title={twist.rule}>
                   {twist.emoji} {twist.name}
@@ -407,7 +410,9 @@ function GuessFeed({ room, myId, api, amDrawer, iGuessed }: { room: RoomState; m
     list.current?.scrollTo({ top: list.current.scrollHeight, behavior: "smooth" });
   }, [g.feed.length]);
   useEffect(() => {
-    if (canGuess) input.current?.focus();
+    // On phones, focusing would pop the keyboard over the drawing; let people tap the box themselves.
+    const touch = window.matchMedia?.("(pointer: coarse)").matches;
+    if (canGuess && !touch) input.current?.focus();
   }, [canGuess]);
   useEffect(() => {
     if (!api.nudge) return;
