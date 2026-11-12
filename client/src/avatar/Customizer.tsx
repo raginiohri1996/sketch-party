@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { Emoji, type EmojiName } from "../ui/Emoji";
 import { Avatar, type AvatarCrop } from "./Avatar";
 import {
@@ -55,7 +55,7 @@ function buildTabs(config: AvatarConfig, onChange: (next: AvatarConfig) => void)
   const groups = (...list: (Group | false)[]) => list.filter(Boolean) as Group[];
   return [
     {
-      id: "body", label: "Body", icon: "Bust in silhouette",
+      id: "body", label: "Body", icon: "Person gesturing ok",
       groups: groups(
         { title: "Body type", render: (p) => <Previews list={BODY_SHAPES} value={config.body} crop="full" preview={(v) => ({ ...config, body: v })} onPick={(v) => set("body", v, p)} /> },
         { title: "Skin tone", render: (p) => <Swatches colors={SKIN_TONES} value={config.skin} onPick={(v) => set("skin", v, p)} /> },
@@ -71,7 +71,7 @@ function buildTabs(config: AvatarConfig, onChange: (next: AvatarConfig) => void)
       ),
     },
     {
-      id: "hair", label: "Hair", icon: "Scissors",
+      id: "hair", label: "Hair", icon: "Person getting haircut",
       groups: groups(
         { title: "Hairstyle", render: (p) => <Previews list={HAIR_STYLES} value={config.hair} crop="head" compact preview={(v) => ({ ...config, hair: v, extra: "none" })} onPick={(v) => set("hair", v, p)} /> },
         { title: "Hair color", render: (p) => <Swatches colors={HAIR_COLORS} value={config.hairColor} onPick={(v) => set("hairColor", v, p)} /> },
@@ -95,7 +95,7 @@ function buildTabs(config: AvatarConfig, onChange: (next: AvatarConfig) => void)
       ),
     },
     {
-      id: "extras", label: "Extras", icon: "Sunglasses",
+      id: "extras", label: "Extras", icon: "Billed cap",
       groups: groups(
         { title: "Eyewear", render: (p) => <Previews list={EYEWEAR} value={config.eyewear} crop="head" compact preview={(v) => ({ ...config, eyewear: v })} onPick={(v) => set("eyewear", v, p)} /> },
         { title: "Accessory", render: (p) => <Previews list={EXTRAS} value={config.extra} crop="bust" preview={(v) => ({ ...config, extra: v })} onPick={(v) => set("extra", v, p)} /> },
@@ -146,6 +146,17 @@ export function PhoneCustomizer({ config, onChange }: Props) {
   const open = tabs.find((t) => t.id === openId) ?? null;
   const group = open?.groups[Math.min(groupIndex, open.groups.length - 1)];
   const bar = useRef<HTMLDivElement>(null);
+  const buttons = useRef<(HTMLButtonElement | null)[]>([]);
+  const [center, setCenter] = useState(0);
+  const panel = useRef<HTMLDivElement>(null);
+  const wrap = useRef<HTMLDivElement>(null);
+  const [barTop, setBarTop] = useState(0);
+  // Centre the open bar on its icon, using the bar's real height, and keep it inside the stage.
+  useLayoutEffect(() => {
+    const h = panel.current?.offsetHeight ?? 0;
+    const room = wrap.current?.clientHeight ?? 0;
+    setBarTop(Math.max(0, Math.min(center - h / 2, room - h)));
+  }, [center, openId, groupIndex]);
   const close = () => setOpenId(null);
 
   useEffect(() => {
@@ -160,20 +171,23 @@ export function PhoneCustomizer({ config, onChange }: Props) {
     bar.current?.querySelector<HTMLElement>("[aria-pressed='true']")?.scrollIntoView({ inline: "center", block: "nearest" });
   }, [openId, groupIndex]);
 
-  const toggle = (id: string) => {
+  const toggle = (id: string, i: number) => {
+    const b = buttons.current[i];
+    if (b) setCenter(b.offsetTop + b.offsetHeight / 2);
     setGroupIndex(0);
     setOpenId((cur) => (cur === id ? null : id));
   };
 
   return (
     // Stop the avatar stage from treating taps here as "drag to turn".
-    <div className="rail-wrap" onPointerDown={(e) => e.stopPropagation()}>
+    <div ref={wrap} className="rail-wrap" onPointerDown={(e) => e.stopPropagation()}>
       <nav className="rail" aria-label="Customize your avatar">
-        {tabs.map((t) => (
+        {tabs.map((t, i) => (
           <button
             key={t.id}
+            ref={(el) => { buttons.current[i] = el; }}
             className={`rail__btn ${openId === t.id ? "rail__btn--on" : ""}`}
-            onClick={() => toggle(t.id)}
+            onClick={() => toggle(t.id, i)}
             aria-expanded={openId === t.id}
             aria-label={t.label}
             title={t.label}
@@ -187,11 +201,11 @@ export function PhoneCustomizer({ config, onChange }: Props) {
         <>
           <button className="rail-scrim" aria-label="Close" onClick={close} />
           <div
+            ref={panel}
             className="railbar glass glass--frost"
             role="dialog"
             aria-label={`${open.label} options`}
-            // Line the bar up with its icon, but never let it hang off the bottom of the stage.
-            style={{ top: `max(0px, min(calc(${tabs.indexOf(open)} * var(--rail-step)), calc(100% - var(--railbar-h))))` }}
+            style={{ top: barTop }}
           >
             <div className="railbar__head">
               {open.groups.length > 1 ? (

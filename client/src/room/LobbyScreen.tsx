@@ -35,7 +35,7 @@ export function LobbyScreen({ room, myId, api, online }: Props) {
   };
 
   return (
-    <div className="home">
+    <div className="home home--lobby">
       <TopBar online={online}>
         {api.reconnecting && <span className="online online--warn">Reconnecting…</span>}
         <button className="btn btn--ghost btn--sm" onClick={api.leave}>
@@ -201,7 +201,7 @@ function Choice<T extends number>({
 
 function Toggle({ label, hint, value, disabled, onChange }: { label: string; hint: string; value: boolean; disabled: boolean; onChange: (v: boolean) => void }) {
   return (
-    <div className="setting">
+    <div className="setting setting--toggle">
       <div className="setting__text">
         <span className="setting__label">{label}</span>
         <span className="setting__hint">{hint}</span>

@@ -741,3 +741,44 @@ body { overscroll-behavior-y: contain; }
   .home--phone .play .btn { white-space: nowrap; padding-left: 12px; padding-right: 12px; }
   .home--phone .play .btn--outline img { display: none; }
 }
+
+/* Rail v2: on the right, bigger icons spread down the full height of the character card. */
+.rail-wrap { inset: 12px; }
+.rail { left: auto; right: 0; top: 0; bottom: 0; display: flex; flex-direction: column; justify-content: space-between; gap: 8px; }
+.rail__btn { width: 52px; height: 52px; border-radius: 16px; flex: 0 1 52px; min-height: 40px; }
+.rail__btn img { width: 28px; height: 28px; }
+.railbar { left: 0; right: 64px; transform-origin: right center; animation-name: railInRight; }
+@keyframes railInRight { from { opacity: 0; transform: translateX(12px) scaleX(0.92); } }
+@media (max-width: 880px) {
+  .home--phone .stage__avatar { margin-left: 0; margin-right: 56px; }
+}
+
+/* ─── Phone lobby: one screen ─── */
+@media (max-width: 880px) {
+  .home--lobby { height: 100vh; height: 100dvh; min-height: 0; overflow: hidden; padding-bottom: 12px; }
+  .home--lobby .home__main { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 10px; }
+  .home--lobby .lobby { flex: none; padding: 12px; gap: 8px; }
+  .home--lobby .lobby__head { flex-direction: row; align-items: center; justify-content: space-between; gap: 8px; }
+  .home--lobby .lobby__label { display: none; }
+  .home--lobby .lobby__code { gap: 5px; }
+  .home--lobby .lobby__code span { width: 38px; height: 46px; font-size: 1.5rem; border-radius: 11px; }
+  .home--lobby .lobby__head .btn { padding: 9px 12px; font-size: 0.85rem; }
+  .home--lobby .lobby__count { font-size: 0.78rem; }
+  .home--lobby .seats { display: flex; flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden; gap: 6px; scrollbar-width: none; padding: 1px; }
+  .home--lobby .seat { flex: none; width: 84px; padding: 6px 4px; gap: 2px; }
+  .home--lobby .seat__avatar { width: 50px; height: 62px; }
+  .home--lobby .seat__name { font-size: 0.76rem; max-width: 78px; }
+  .home--lobby .tag { font-size: 0.64rem; padding: 1px 6px; }
+  .home--lobby .settings { flex: 1; min-height: 0; padding: 12px; gap: 8px; }
+  .home--lobby .settings__title { font-size: 1.1rem; }
+  .home--lobby .settings__sub { display: none; }
+  .home--lobby .settings__body { overflow-y: auto; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+  .home--lobby .setting { grid-column: 1 / -1; flex-wrap: nowrap; padding: 8px 10px; gap: 8px; }
+  .home--lobby .setting__hint { display: none; }
+  .home--lobby .setting__label { font-size: 0.88rem; }
+  .home--lobby .setting--toggle { grid-column: auto; flex-direction: column; justify-content: center; gap: 6px; padding: 10px 4px; text-align: center; }
+  .home--lobby .choice__opt { padding: 5px 8px; min-width: 34px; font-size: 0.8rem; }
+  .home--lobby .stepper__btn { width: 28px; height: 28px; }
+  .home--lobby .settings__foot { position: static; }
+  .home--lobby .settings__foot .btn--primary { padding: 13px 18px; font-size: 1rem; }
+}

@@ -22,10 +22,13 @@ export const EMOJI = {
   "Hourglass not done": "⏳",
   Trophy: "🏆",
   "Bust in silhouette": "👤",
+  "Person gesturing ok": "🙆",
+  "Person getting haircut": "💇",
   "Smiling face with smiling eyes": "😊",
   Scissors: "✂️",
   Necktie: "👔",
   Sunglasses: "🕶️",
+  "Billed cap": "🧢",
   "1st place medal": "🥇",
   "2nd place medal": "🥈",
   "3rd place medal": "🥉",
@@ -33,8 +36,12 @@ export const EMOJI = {
 
 export type EmojiName = keyof typeof EMOJI;
 
+/** People emoji come in skin tones; Fluent keeps the default tone in a "Default" folder. */
+const SKIN_TONED = new Set<string>(["Person gesturing ok", "Person getting haircut"]);
+
 function url(name: string) {
   const file = name.toLowerCase().replace(/[’']/g, "").replace(/[\s-]+/g, "_");
+  if (SKIN_TONED.has(name)) return `${BASE}/${encodeURIComponent(name)}/Default/Flat/${file}_flat_default.svg`;
   return `${BASE}/${encodeURIComponent(name)}/Flat/${file}_flat.svg`;
 }
 
