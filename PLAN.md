@@ -24,6 +24,20 @@ A round = every player draws once. Multiple rounds, timed turns.
 | Player-name filter | |
 | Hosted live URL + README | |
 
+## Visual direction
+
+**Vibe: "Game night" — playful, but for adults at the office.** Party-game-show energy after work, never kindergarten.
+
+- **Color:** dark ink/navy base (`#141327`) with bright pops: coral `#ff6b5b`, lime `#c6f432`, violet `#8b6cff`, tangerine `#ffa53d`. Each player gets an accent color.
+- **Surfaces:** frosted-glass cards, ~18px corners, pill buttons. A few soft glowing orbs drift in the background (subtle, not bubbly).
+- **Type:** headings in **Bricolage Grotesque** (bold, quirky), body in **DM Sans** (Google Fonts).
+- **Emoji:** **Microsoft Fluent Emoji, Flat style** (MIT), used for hints, reactions and icons. Same look on every computer.
+- **Characters:** adult, modern flat illustration. Head ≈ ⅕ of height, necks, shoulders, longer legs. Small eyes with eyebrows, a nose, subtle mouths; blush optional (off by default). Office-casual wardrobe (blazer, shirt, turtleneck, sweater, hoodie, tee, dress, jumpsuit) plus beard/mustache, earrings, coffee mug, ID lanyard.
+- **Copy:** witty office humor (e.g. names like "Chief Doodle Officer", "Per My Last Sketch").
+- **Motion:** snappy and springy, not squishy-cute. Buttons press down, cards slide in, confetti on correct guesses. Respect "reduce motion" settings.
+
+_Changed 2026-11-12: first pass (candy pastels, chibi characters, Fredoka) read as a kids' game._
+
 ## Stack
 
 - **Client:** Vite + React + TypeScript, HTML canvas, SVG-layered avatars (2.5D)

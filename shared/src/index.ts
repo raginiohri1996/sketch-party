@@ -17,3 +17,4 @@ export interface ServerToClientEvents {
 export interface ClientToServerEvents {
   "client:ping": (ack: (serverTime: number) => void) => void;
 }
+export * from "./names";

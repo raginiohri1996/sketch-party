@@ -2,7 +2,7 @@
 
 A multiplayer draw-and-guess party game with a twist. One player draws an AI-picked word, everyone else races to guess it. Hints come as emojis, riddles and sounds instead of letters, and random round modifiers and sabotage keep every turn chaotic. Playing alone? AI players fill the empty seats.
 
-**▶ Play now:** _live link coming soon_
+**▶ Play now:** https://sketch-party-k0ic.onrender.com
 
 > 🚧 Early development. See [PLAN.md](PLAN.md) for the roadmap.
 
