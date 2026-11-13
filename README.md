@@ -78,4 +78,4 @@ See [CONTRIBUTING.md](CONTRIBUTING.md). Ideas welcome: new word packs, twists, o
 
 ## License
 
-[MIT](LICENSE)
+Code: [MIT](LICENSE). Animal sound recordings come from Wikimedia Commons under their own licenses; see [CREDITS.md](CREDITS.md).

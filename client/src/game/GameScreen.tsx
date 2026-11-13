@@ -358,7 +358,7 @@ function HintBar({ hints, hintsLeft }: { hints: Hint[]; hintsLeft: number }) {
           <span key={i} className={`hint hint--${h.kind}`}>
             <span className="hint__icon">{HINT_META[h.kind].icon}</span>
             {h.kind === "sound" ? (
-              <button className="hint__play" onClick={() => playSound(h.sound!)}>
+              <button className="hint__play" onClick={() => playSound(h.sound!, true)}>
                 Play sound again
               </button>
             ) : (

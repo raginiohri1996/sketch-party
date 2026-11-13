@@ -17,16 +17,16 @@ taco|Food|e|🌮|Tuesday's favourite food|Folded shell with fillings|Mexican str
 egg|Food|e|🥚|Breakfast staple|Oval with a shell|Chickens lay these||chicken,omelette
 cheese|Food|e|🧀|Say this for a photo|Made from milk, sometimes full of holes|Cartoon mice love it||butter,milk
 carrot|Food|e|🥕|Rabbits crunch on these|Orange and pointy|Grows underground with a leafy top|crunch|radish
-cat/kitten|Animal|e|🐱|Secretly rules the internet|Purrs and has whiskers|Says meow|meow|lion,tiger,dog
-dog/puppy|Animal|e|🐶|Loyal companion|Wags its tail|Man's best friend|bark|wolf,cat
+cat/kitten|Animal|e|🐱|Secretly rules the internet|Purrs and has whiskers|Says meow|cat|lion,tiger,dog
+dog/puppy|Animal|e|🐶|Loyal companion|Wags its tail|Man's best friend|dog|wolf,cat
 fish|Animal|e|🐟|Lives in water|Has fins and gills|Nemo is one|splash|shark,whale,goldfish
 bird|Animal|e|🐦|Has feathers|Builds nests and lays eggs|Tweets, but not online|chirp|parrot,pigeon
-snake|Animal|e|🐍|No legs at all|Slithers along the ground|Sheds its skin|hiss|worm,lizard,python
+snake|Animal|e|🐍|No legs at all|Slithers along the ground|Sheds its skin|snake|worm,lizard,python
 spider|Animal|e|🕷️|Eight legs|Spins webs|Bit a famous superhero||ant,insect,bug
-bee|Animal|e|🐝|Busy worker|Yellow and black stripes|Makes honey|buzz|wasp,fly,hornet
-duck|Animal|e|🦆|Waddles|Flat bill, loves ponds|Says quack|quack|goose,swan
-frog|Animal|e|🐸|Can jump really far|Green, lives near ponds|A princess kisses one|croak|toad
-owl|Animal|e|🦉|Works the night shift|Big eyes, turns its head right round|Says hoo hoo|hoot|eagle,bird
+bee|Animal|e|🐝|Busy worker|Yellow and black stripes|Makes honey|bee|wasp,fly,hornet
+duck|Animal|e|🦆|Waddles|Flat bill, loves ponds|Says quack|duck|goose,swan
+frog|Animal|e|🐸|Can jump really far|Green, lives near ponds|A princess kisses one|frog|toad
+owl|Animal|e|🦉|Works the night shift|Big eyes, turns its head right round|Says hoo hoo|owl|eagle,bird
 turtle|Animal|e|🐢|Never in a hurry|Carries its house on its back|Beat a hare in a famous race||tortoise
 rabbit/bunny|Animal|e|🐰|Hops around|Long ears, fluffy tail|Easter mascot||hare,mouse
 sun|Nature|e|☀️|Everyone's morning alarm|Hot, bright, up in the sky|Earth goes around it||star
@@ -93,9 +93,9 @@ windmill|Place|m|🌬️🌾|Spins in the wind|Big sails on a tower|The Netherla
 volcano|Nature|m|🌋|A very hot mountain|Spews lava|It erupts|thunder|mountain
 island|Nature|m|🏝️|Surrounded by water|Palm trees and sand|Where castaways end up|splash|beach
 waterfall|Nature|m|🏞️💧|Water on the move|Niagara is famous|A river drops over a cliff|rain|river,fountain
-penguin|Animal|m|🐧|Always wears a tuxedo|A bird that can't fly|Lives in Antarctica|splash|puffin
+penguin|Animal|m|🐧|Always wears a tuxedo|A bird that can't fly|Lives in Antarctica|penguin|puffin
 giraffe|Animal|m|🦒|Very tall|Long neck and spots|Eats leaves from treetops||camel,zebra
-elephant|Animal|m|🐘|Never forgets|Big ears and a trunk|Largest animal on land|trumpet|mammoth,rhino
+elephant|Animal|m|🐘|Never forgets|Big ears and a trunk|Largest animal on land|elephant|mammoth,rhino
 octopus|Animal|m|🐙|Eight arms|Squirts ink|Lives on the sea floor|bubble|squid,jellyfish
 dolphin|Animal|m|🐬|Very clever|Swims and clicks|Jumps out of the waves|splash|shark,whale
 kangaroo|Animal|m|🦘|Hops|Has a pouch|From Australia|boing|wallaby
@@ -189,4 +189,13 @@ wind chime/windchime|Home|m|🎐|Sings when the breeze blows|Hollow tubes hangin
 doorbell|Home|m|🔔🚪|Someone's here|A button by the front door|Ding dong!|ding|bell,door
 alarm clock|Home|m|⏰😫|Nobody's favourite sound|Wakes you up in the morning|Hit snooze|ring|clock,alarm
 dripping tap/dripping faucet/leaky tap|Home|h|🚰💧|Keeps you up at night|Time to call a plumber|Plip… plip… plip from the sink|drip|tap,faucet,sink
+lion|Animal|e|🦁|King of the jungle|Big cat with a mane|Simba grew up to be one|lion|tiger,cat,leopard
+cow|Animal|e|🐄|Lives on a farm|Black and white patches|Gives us milk|cow|bull,ox,calf
+horse|Animal|e|🐴|You can ride it|Has a mane and hooves|Gallops and neighs|horse|pony,donkey,zebra
+sheep/lamb|Animal|e|🐑|Very woolly|Lives in a flock|Count them to fall asleep|sheep|goat,ram
+rooster/cockerel|Animal|m|🐓|Farm alarm clock|Has a red comb on its head|Cock-a-doodle-doo at sunrise|rooster|chicken,hen
+wolf|Animal|m|🐺|Lives in a pack|Wild cousin of the dog|Howls at the full moon|wolf|dog,fox,coyote
+pig|Animal|e|🐷|Loves rolling in mud|Pink with a curly tail|Says oink|pig|hog,boar
+crow|Animal|m|🐦‍⬛|A clever black bird|Scarecrows are meant to scare it|Says caw|crow|raven,blackbird
+monkey|Animal|e|🐒|Loves bananas|Swings from tree to tree|A cheeky primate with a long tail|monkey|ape,chimpanzee,gorilla
 `;

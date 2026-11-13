@@ -1,4 +1,4 @@
-import type { SoundId } from "@sketch/shared";
+import { RECORDED_SOUND_IDS, type SynthSoundId } from "@sketch/shared";
 
 // Sound hints, synthesized live with the Web Audio API: no audio files to download or license.
 // Each recipe is a tiny arrangement of tones and filtered noise, about one to two seconds long.
@@ -62,7 +62,7 @@ function repeat(n: number, gap: number, fn: (at: number, i: number) => void) {
   for (let i = 0; i < n; i++) fn(i * gap, i);
 };
 
-const RECIPES: Record<SoundId, (c: AudioContext, o: AudioNode) => void> = {
+const RECIPES: Record<SynthSoundId, (c: AudioContext, o: AudioNode) => void> = {
   ring: (c, o) => repeat(2, 0.5, (t) => repeat(8, 0.045, (u) => { tone(c, o, t + u, 1250, 0.04, "square", 0.15); tone(c, o, t + u, 1550, 0.04, "square", 0.12); })),
   beep: (c, o) => repeat(3, 0.22, (t) => tone(c, o, t, 1000, 0.12, "square", 0.2)),
   ding: (c, o) => { tone(c, o, 0, 1318, 1.2, "sine", 0.5); tone(c, o, 0, 2636, 0.6, "sine", 0.15); },
@@ -150,7 +150,8 @@ export const soundSettings = {
 export function playSound(id: string, force = false) {
   if (settings.muted && !force) return;
   const c = audio();
-  const recipe = RECIPES[id as SoundId];
+  if ((RECORDED_SOUND_IDS as readonly string[]).includes(id)) return playRecording(id);
+  const recipe = RECIPES[id as SynthSoundId];
   if (!c || !recipe) return;
   recipe(c, master(c));
 }
@@ -222,4 +223,39 @@ const music = {
 /** Browsers only allow audio after a click, so music starts on the first interaction if it was left on. */
 if (typeof window !== "undefined") {
   window.addEventListener("pointerdown", () => settings.music && !settings.muted && music.start(), { once: true });
+}
+
+// ── Recorded sounds (real animal calls) ─────────────────────────
+
+const MAX_CLIP_SECONDS = 3.5;
+/**
+ * Where the most recognisable 3.5 seconds start in each recording (found by measuring loudness),
+ * so long field recordings play the actual roar / crow / howl instead of background noise.
+ */
+const CLIP_START: Record<string, number> = {
+  lion: 4.9, rooster: 2.05, owl: 4.25, wolf: 20, penguin: 19.1, duck: 68.7, cat: 8.35, bee: 8.35,
+};
+let current: HTMLAudioElement | null = null;
+
+/** Plays /sounds/<id>.mp3, cut to a few seconds with a short fade so long recordings don't drag on. */
+function playRecording(id: string) {
+  current?.pause();
+  const start = CLIP_START[id];
+  // A media fragment (#t=) starts playback at that point in the file.
+  const el = new Audio(`/sounds/${id}.mp3${start ? `#t=${start}` : ""}`);
+  el.volume = 0.85;
+  current = el;
+  void el.play().catch(() => {
+    /* autoplay blocked or file missing: the hint still shows, people can press "play again" */
+  });
+  const fadeAt = (MAX_CLIP_SECONDS - 0.5) * 1000;
+  window.setTimeout(() => {
+    const step = window.setInterval(() => {
+      el.volume = Math.max(0, el.volume - 0.17);
+      if (el.volume <= 0.01) {
+        el.pause();
+        window.clearInterval(step);
+      }
+    }, 100);
+  }, fadeAt);
 }

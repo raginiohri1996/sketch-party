@@ -66,14 +66,22 @@ export const HINT_PENALTY = 0.15;
 /** The drawer earns this per unused hint when at least one person guesses. */
 export const HINT_BONUS = 30;
 
-/** Sound hints are synthesized in the browser; these are the recipes it knows. */
-export const SOUND_IDS = [
+/** Sound hints synthesized in the browser (Web Audio recipes). */
+export const SYNTH_SOUND_IDS = [
   "ring", "beep", "ding", "tick", "buzz", "whoosh", "splash", "engine", "siren", "pop", "chime", "drum", "pluck",
   "piano", "thunder", "rain", "heartbeat", "click", "typing", "whistle", "laser", "trumpet", "boing", "honk",
   "chirp", "hoot", "croak", "crunch", "sizzle", "pour", "bubble", "hiss", "knock", "jingle", "roar",
   "windchime", "drip", "bark", "meow", "quack",
 ] as const;
-export type SoundId = (typeof SOUND_IDS)[number];
+/** Real recordings (client/public/sounds/<id>.mp3, credited in CREDITS.md). Used for animals. */
+export const RECORDED_SOUND_IDS = [
+  "lion", "cat", "dog", "cow", "horse", "sheep", "rooster", "elephant", "duck", "frog", "owl", "wolf",
+  "pig", "bee", "snake", "penguin", "crow", "monkey",
+] as const;
+export const SOUND_IDS = [...SYNTH_SOUND_IDS, ...RECORDED_SOUND_IDS] as const;
+export type SynthSoundId = (typeof SYNTH_SOUND_IDS)[number];
+export type RecordedSoundId = (typeof RECORDED_SOUND_IDS)[number];
+export type SoundId = SynthSoundId | RecordedSoundId;
 
 // ── Twists (round modifiers) ─────────────────────────────────
 
