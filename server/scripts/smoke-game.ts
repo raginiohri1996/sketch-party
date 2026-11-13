@@ -56,10 +56,12 @@ let turns = 0;
 let sawWrongGuess = false;
 let sawStrokeRelay = false;
 let leakedWord = false;
+let twisted = 0;
 
 while (turns < 6) {
   const ok = await until(() => a.state?.phase === "results" || a.state?.game?.phase === "choosing");
   if (!ok || a.state?.phase === "results") break;
+  if (a.state!.game!.modifier) twisted++;
   const drawerId = a.state!.game!.drawerId;
   const drawer = everyone.find((p) => p.id === drawerId)!;
   const guessers = everyone.filter((p) => p !== drawer);
@@ -103,16 +105,16 @@ while (turns < 6) {
   await wait(500);
   if (turns === 0) {
     check("first correct guess earns 2 coins", a.state!.game!.coins[guessers[0]!.id] === 2);
-    guessers[0]!.s.emit("game:sabotage", "tinyBrush");
+    guessers[0]!.s.emit("game:sabotage", "hugeBrush");
     await wait(200);
     const sg = a.state!.game!;
-    check("sabotage works and costs coins", sg.sabotage?.kind === "tinyBrush" && sg.coins[guessers[0]!.id] === 1);
-    guessers[0]!.s.emit("game:sabotage", "splat");
+    check("sabotage works and costs coins", sg.sabotage?.kind === "hugeBrush" && sg.coins[guessers[0]!.id] === 1);
+    guessers[0]!.s.emit("game:sabotage", "holi");
     await wait(150);
     check("only one sabotage per player per turn", a.state!.game!.coins[guessers[0]!.id] === 1);
     drawer.s.emit("draw:begin", { id: "tiny", tool: "pen", color: "#2f6bff", size: 22, points: [0.5, 0.5] });
     await wait(150);
-    check("tiny brush forces the smallest size", guessers[1]!.strokes.find((s) => s.id === "tiny")?.size === 4);
+    check("huge brush forces the fat marker", guessers[1]!.strokes.find((s) => s.id === "tiny")?.size === 46);
   }
   guessers[1]!.s.emit("game:guess", word);
   const revealed = await until(() => a.state?.game?.phase === "reveal");
@@ -127,6 +129,7 @@ check("strokes reach the other players", sawStrokeRelay);
 check("wrong guesses show in the feed", sawWrongGuess);
 check("the word never leaks to guessers before the reveal", !leakedWord);
 check("6 turns played (3 players × 2 rounds)", turns === 6, `${turns}`);
+check("exactly half the turns had a twist", twisted === 3, `${twisted} of 6`);
 await until(() => a.state?.phase === "results");
 const scores = a.state?.game?.scores ?? {};
 check("game ends on the results screen with scores", a.state?.phase === "results" && Object.values(scores).every((s) => s > 0), JSON.stringify(scores));

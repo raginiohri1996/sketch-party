@@ -92,6 +92,22 @@ export function GameScreen({ room, myId, api, online }: Props) {
     if (g.phase === "drawing" && secondsLeft > 0 && secondsLeft <= 5) sfx.tick();
   }, [secondsLeft, g.phase]);
 
+  // "Hit!" banner for everyone when someone sabotages the drawer.
+  const [hit, setHit] = useState<{ key: number; text: string } | null>(null);
+  const lastHit = useRef(0);
+  useEffect(() => {
+    const s = g.sabotage;
+    if (!s || s.until === lastHit.current) return;
+    lastHit.current = s.until;
+    const spec = SABOTAGES[s.kind];
+    const by = byId.get(s.byId)?.name ?? "Someone";
+    setHit({ key: s.until, text: amDrawer ? `${spec.emoji} ${by} hit you with ${spec.name}!` : `${spec.emoji} ${by} ${spec.verb}!` });
+    sfx.hit();
+    const t = window.setTimeout(() => setHit(null), 2400);
+    return () => window.clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [g.sabotage?.until]);
+
   // First game ever in this browser: show the quick guide.
   const [showHow, setShowHow] = useState(() => {
     try {
@@ -205,6 +221,12 @@ export function GameScreen({ room, myId, api, online }: Props) {
                 onInk={onInk}
               />
 
+              {hit && (
+                <div key={hit.key} className="hit" role="status">
+                  {hit.text}
+                </div>
+              )}
+
               {g.phase === "choosing" && (
                 <div className="overlay">
                   <div className="choose">
@@ -281,9 +303,9 @@ export function GameScreen({ room, myId, api, online }: Props) {
                 {BRUSH_SIZES.map((s) => (
                   <button
                     key={s}
-                    className={`tools__size ${(effect === "tinyBrush" ? BRUSH_SIZES[0] : size) === s ? "tools__size--on" : ""}`}
+                    className={`tools__size ${effect !== "hugeBrush" && size === s ? "tools__size--on" : ""}`}
                     onClick={() => setSize(s)}
-                    disabled={effect === "tinyBrush"}
+                    disabled={effect === "hugeBrush"}
                     aria-label={`Brush size ${s}`}
                     aria-pressed={size === s}
                   >

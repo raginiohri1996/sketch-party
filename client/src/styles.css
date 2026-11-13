@@ -782,3 +782,77 @@ body { overscroll-behavior-y: contain; }
   .home--lobby .settings__foot { position: static; }
   .home--lobby .settings__foot .btn--primary { padding: 13px 18px; font-size: 1rem; }
 }
+
+/* ─── Sabotage effects (drawer's screen only) ─── */
+.splat { display: none; }
+.board--quake { animation: quake 0.12s linear infinite; }
+@keyframes quake {
+  0% { transform: translate(0, 0) rotate(0); }
+  25% { transform: translate(-4px, 2px) rotate(-0.6deg); }
+  50% { transform: translate(3px, -3px) rotate(0.5deg); }
+  75% { transform: translate(-2px, -2px) rotate(-0.3deg); }
+  100% { transform: translate(0, 0) rotate(0); }
+}
+.board--flip { transform: rotate(180deg); transition: transform 0.5s var(--ease); }
+
+/* Holi: powdery colour splats that burst in, with droplets flying off. */
+.holi { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.holi__splat { position: absolute; aspect-ratio: 1; transform: translate(-50%, -50%) rotate(var(--rot)); animation: holiIn 0.45s cubic-bezier(0.2, 1.6, 0.4, 1) both; }
+@keyframes holiIn { from { transform: translate(-50%, -50%) rotate(var(--rot)) scale(0); opacity: 0; } }
+.holi__blob {
+  position: absolute; inset: 0; border-radius: 46% 54% 38% 62% / 55% 41% 59% 45%;
+  background:
+    radial-gradient(circle at 35% 40%, color-mix(in srgb, var(--c) 70%, white) 0 8%, transparent 30%),
+    radial-gradient(circle at 50% 50%, var(--c) 0 42%, color-mix(in srgb, var(--c) 75%, transparent) 55%, transparent 70%);
+  filter: blur(0.6px) saturate(1.2);
+  box-shadow: 0 0 22px 6px color-mix(in srgb, var(--c) 45%, transparent);
+}
+.holi__drop {
+  position: absolute; left: 50%; top: 50%; border-radius: 50%; background: var(--c);
+  transform: translate(-50%, -50%) translate(var(--dx), var(--dy));
+  animation: holiDrop 0.55s cubic-bezier(0.1, 0.8, 0.3, 1) both;
+  box-shadow: 0 0 6px color-mix(in srgb, var(--c) 60%, transparent);
+}
+@keyframes holiDrop { from { transform: translate(-50%, -50%) translate(0, 0) scale(0.3); opacity: 0; } 30% { opacity: 1; } }
+
+/* Fog: drifting white haze that blurs what's underneath. */
+.fog { position: absolute; inset: 0; pointer-events: none; -webkit-backdrop-filter: blur(5px); backdrop-filter: blur(5px); background: rgba(235, 238, 245, 0.45); animation: fogIn 0.8s ease both; overflow: hidden; }
+@keyframes fogIn { from { opacity: 0; } }
+.fog span { position: absolute; width: 90%; aspect-ratio: 2; border-radius: 50%; background: radial-gradient(ellipse, rgba(255, 255, 255, 0.85), transparent 70%); animation: fogDrift 6s ease-in-out infinite alternate; }
+.fog span:nth-child(1) { left: -20%; top: 5%; }
+.fog span:nth-child(2) { left: 30%; top: 40%; animation-duration: 7s; animation-delay: -2s; }
+.fog span:nth-child(3) { left: -10%; top: 65%; animation-duration: 5s; animation-delay: -4s; }
+@keyframes fogDrift { to { transform: translateX(25%); } }
+
+/* Freeze: an icy pane over the canvas. */
+.frozen {
+  position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none;
+  background: linear-gradient(135deg, rgba(190, 235, 255, 0.75), rgba(140, 200, 255, 0.55));
+  box-shadow: inset 0 0 40px 10px rgba(255, 255, 255, 0.9), inset 0 0 0 3px rgba(255, 255, 255, 0.8);
+  -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
+  animation: freezeIn 0.35s ease both;
+}
+@keyframes freezeIn { from { opacity: 0; transform: scale(1.04); } }
+.frozen__label { font-family: var(--font-head); font-weight: 800; font-size: 2rem; color: #0b4a73; text-shadow: 0 2px 0 rgba(255, 255, 255, 0.8); animation: pop 0.45s var(--ease); }
+
+/* "Hit!" banner everyone sees when someone sabotages. */
+.hit { position: absolute; left: 50%; top: 12px; z-index: 6; transform: translateX(-50%); max-width: calc(100% - 24px); padding: 8px 14px; border-radius: 999px; font-weight: 700; font-size: 0.9rem; text-align: center; color: #fff; background: linear-gradient(120deg, rgba(255, 79, 216, 0.92), rgba(122, 92, 255, 0.92)); box-shadow: 0 10px 30px -8px rgba(255, 79, 216, 0.8); animation: hitIn 2.4s var(--ease) both; pointer-events: none; }
+@keyframes hitIn { 0% { opacity: 0; transform: translate(-50%, -12px) scale(0.9); } 12% { opacity: 1; transform: translate(-50%, 0) scale(1.04); } 20% { transform: translate(-50%, 0) scale(1); } 85% { opacity: 1; } 100% { opacity: 0; } }
+
+/* Lobby: what people who joined see instead of the settings. */
+.waitroom { padding: 24px 22px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; text-align: center; }
+.waitroom__avatar { width: 120px; height: 150px; animation: breathe 3.5s ease-in-out infinite; }
+.waitroom__title { margin: 0; font-family: var(--font-head); font-weight: 800; font-size: 1.5rem; letter-spacing: -0.03em; }
+.waitroom__sub { margin: 0; max-width: 34ch; color: var(--muted); font-size: 0.95rem; }
+.waitroom .waiting { width: 100%; max-width: 360px; margin-top: 6px; }
+@media (max-width: 880px) {
+  .home--lobby .waitroom { flex: 1; min-height: 0; padding: 16px; gap: 8px; }
+  .home--lobby .waitroom__avatar { width: 80px; height: 100px; }
+  .home--lobby .waitroom__title { font-size: 1.2rem; }
+  .home--lobby .waitroom__sub { font-size: 0.85rem; }
+}
+.waitroom .waiting { flex: none; }
+/* Fog v2: blur the drawing itself (reliable everywhere) under a thicker drifting haze. */
+.board--fog .board__canvas { filter: blur(6px) contrast(0.85); transition: filter 0.6s ease; }
+.fog { -webkit-backdrop-filter: none; backdrop-filter: none; background: rgba(240, 242, 248, 0.38); }
+.fog span { background: radial-gradient(ellipse, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.4) 45%, transparent 70%); }

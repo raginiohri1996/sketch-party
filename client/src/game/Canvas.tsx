@@ -1,5 +1,5 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
-import { BRUSH_SIZES, INK_BUDGET, type ModifierId, type SabotageKind, type Stroke, type Tool } from "@sketch/shared";
+import { DRAW_COLORS, HUGE_BRUSH, INK_BUDGET, type ModifierId, type SabotageKind, type Stroke, type Tool } from "@sketch/shared";
 import { socket } from "../socket";
 
 export const PAPER = "#fbfaf6";
@@ -65,6 +65,7 @@ type Props = {
  * Strokes use 0–1 coordinates, so the picture looks identical on every screen size.
  */
 export const Canvas = forwardRef<CanvasHandle, Props>(function Canvas({ canDraw, tool, color, size, modifier, effect, flashlight, onInk }, ref) {
+  if (canDraw && DEBUG_FX && !effect) effect = DEBUG_FX;
   const wrap = useRef<HTMLDivElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
   const current = useRef<Stroke | null>(null);
@@ -73,9 +74,9 @@ export const Canvas = forwardRef<CanvasHandle, Props>(function Canvas({ canDraw,
   const ink = useRef(0);
   const [spot, setSpot] = useState<{ x: number; y: number } | null>(null);
   const blocked = canDraw && (effect === "freeze" || (modifier === "oneLine" && board.strokes.length > 0 && !current.current));
-  const realSize = effect === "tinyBrush" ? BRUSH_SIZES[0] : size;
-  const toolRef = useRef({ tool, color, size: realSize, canDraw: canDraw && !blocked, modifier, onInk });
-  toolRef.current = { tool, color, size: realSize, canDraw: canDraw && !blocked, modifier, onInk };
+  const realSize = effect === "hugeBrush" ? HUGE_BRUSH : size;
+  const toolRef = useRef({ tool, color, size: realSize, canDraw: canDraw && !blocked, modifier, onInk, effect });
+  toolRef.current = { tool, color, size: realSize, canDraw: canDraw && !blocked, modifier, onInk, effect };
 
   // New turn (empty board): refill the ink.
   useEffect(() => {
@@ -181,6 +182,16 @@ export const Canvas = forwardRef<CanvasHandle, Props>(function Canvas({ canDraw,
     let x = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
     let y = Math.min(1, Math.max(0, (e.clientY - r.top) / r.height));
     if (m === "mirror") x = 1 - x; // Mirror Hands: your hand goes right, the line goes left
+    const fx = toolRef.current.effect;
+    // Upside Down: the board is shown rotated, so map the finger back to where it visually is.
+    if (fx === "upsideDown") {
+      x = 1 - x;
+      y = 1 - y;
+    }
+    if (fx === "earthquake") {
+      x = Math.min(1, Math.max(0, x + (Math.random() - 0.5) * 0.03));
+      y = Math.min(1, Math.max(0, y + (Math.random() - 0.5) * 0.03));
+    }
     if (m === "shaky") {
       x = Math.min(1, Math.max(0, x + (Math.random() - 0.5) * 0.014));
       y = Math.min(1, Math.max(0, y + (Math.random() - 0.5) * 0.014));
@@ -191,9 +202,18 @@ export const Canvas = forwardRef<CanvasHandle, Props>(function Canvas({ canDraw,
   const onDown = (e: React.PointerEvent) => {
     if (!toolRef.current.canDraw || e.button > 0) return;
     if (toolRef.current.modifier === "limitedInk" && ink.current >= INK_BUDGET) return;
+    // One Line: checked right now (not at the last re-render), so quick extra strokes can't sneak onto your screen.
+    if (toolRef.current.modifier === "oneLine" && board.strokes.length > 0) return;
+    if (toolRef.current.effect === "freeze") return;
     e.currentTarget.setPointerCapture(e.pointerId);
     const [x, y] = pos(e);
-    const { tool, color, size } = toolRef.current;
+    const { tool, size } = toolRef.current;
+    // Rainbow Pen: a surprise colour for every line.
+    let color = toolRef.current.color;
+    if (toolRef.current.effect === "rainbow" && tool === "pen") {
+      const options = RAINBOW.filter((c) => c !== lastRainbow);
+      color = lastRainbow = options[Math.floor(Math.random() * options.length)]!;
+    }
     const s: Stroke = { id: Math.random().toString(36).slice(2, 12), tool, color, size, points: [x, y] };
     current.current = s;
     board.strokes.push(s);
@@ -243,7 +263,10 @@ export const Canvas = forwardRef<CanvasHandle, Props>(function Canvas({ canDraw,
   }));
 
   return (
-    <div ref={wrap} className={`board ${canDraw ? `board--draw board--${tool}` : ""} ${blocked ? "board--blocked" : ""}`}>
+    <div
+      ref={wrap}
+      className={`board ${canDraw ? `board--draw board--${tool}` : ""} ${blocked ? "board--blocked" : ""} ${canDraw && effect === "earthquake" ? "board--quake" : ""} ${canDraw && effect === "upsideDown" ? "board--flip" : ""} ${canDraw && effect === "fog" ? "board--fog" : ""}`}
+    >
       <canvas
         ref={canvas}
         className="board__canvas"
@@ -262,14 +285,67 @@ export const Canvas = forwardRef<CanvasHandle, Props>(function Canvas({ canDraw,
           style={{ background: spot ? `radial-gradient(circle at ${spot.x * 100}% ${spot.y * 100}%, transparent 0 9%, rgba(12,10,29,0.985) 15%)` : "rgba(12,10,29,0.985)" }}
         />
       )}
-      {canDraw && effect === "splat" && (
-        <div className="splat" aria-hidden>
-          <span style={{ left: "18%", top: "22%", width: "34%" }} />
-          <span style={{ left: "52%", top: "40%", width: "28%" }} />
-          <span style={{ left: "30%", top: "58%", width: "22%" }} />
+      {canDraw && effect === "holi" && <HoliSplash />}
+      {canDraw && effect === "fog" && (
+        <div className="fog" aria-hidden>
+          <span />
+          <span />
+          <span />
         </div>
       )}
-      {canDraw && effect === "freeze" && <div className="frozen" aria-hidden>🧊 Frozen!</div>}
+      {canDraw && effect === "freeze" && (
+        <div className="frozen" aria-hidden>
+          <span className="frozen__label">🧊 Frozen!</span>
+        </div>
+      )}
     </div>
   );
 });
+
+/** Debug aid: open the page with ?fx=holi (or fog, earthquake, upsideDown, rainbow, hugeBrush, freeze) to force a sabotage on your own drawing turns. */
+const DEBUG_FX = new URLSearchParams(window.location.search).get("fx") as SabotageKind | null;
+
+/** Rainbow Pen: only the bright colours (no black, grey, white or brown), never the same one twice in a row. */
+const RAINBOW = DRAW_COLORS.filter((c) => !["#16151d", "#7d8597", "#f2efe8", "#8a5a36"].includes(c));
+let lastRainbow = "";
+
+const HOLI_COLORS =["#ff2d95", "#ffd400", "#00c97a", "#ff7a00", "#2f6bff", "#a23cff", "#ff4d4d"];
+
+/** Holi colour powder thrown at the screen: splats burst out one after another, with droplets flying off each. */
+function HoliSplash() {
+  const [splats] = useState(() =>
+    Array.from({ length: 7 }, (_, i) => ({
+      x: 8 + Math.random() * 74,
+      y: 6 + Math.random() * 70,
+      size: 22 + Math.random() * 20,
+      color: HOLI_COLORS[(i + Math.floor(Math.random() * HOLI_COLORS.length)) % HOLI_COLORS.length]!,
+      rotate: Math.random() * 360,
+      delay: i * 0.12,
+      drops: Array.from({ length: 9 }, () => {
+        const angle = Math.random() * Math.PI * 2;
+        const dist = 60 + Math.random() * 70;
+        return { dx: Math.cos(angle) * dist, dy: Math.sin(angle) * dist, r: 4 + Math.random() * 8 };
+      }),
+    })),
+  );
+  return (
+    <div className="holi" aria-hidden>
+      {splats.map((s, i) => (
+        <div
+          key={i}
+          className="holi__splat"
+          style={{ left: `${s.x}%`, top: `${s.y}%`, width: `${s.size}%`, "--c": s.color, "--rot": `${s.rotate}deg`, animationDelay: `${s.delay}s` } as React.CSSProperties}
+        >
+          <span className="holi__blob" />
+          {s.drops.map((d, j) => (
+            <span
+              key={j}
+              className="holi__drop"
+              style={{ "--dx": `${d.dx}%`, "--dy": `${d.dy}%`, width: d.r, height: d.r, animationDelay: `${s.delay + 0.05}s` } as React.CSSProperties}
+            />
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+}

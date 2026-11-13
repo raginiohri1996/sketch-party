@@ -98,6 +98,21 @@ const RECIPES: Record<SoundId, (c: AudioContext, o: AudioNode) => void> = {
   knock: (c, o) => repeat(3, 0.2, (t) => { tone(c, o, t, 180, 0.08, "sine", 0.8, 90); noise(c, o, t, 0.04, "bandpass", 800, 0.4); }),
   jingle: (c, o) => repeat(8, 0.08, (t) => tone(c, o, t, 2500 + Math.random() * 2500, 0.25, "sine", 0.15)),
   roar: (c, o) => { noise(c, o, 0, 1.4, "lowpass", 500, 0.9, 150); tone(c, o, 0, 90, 1.4, "sawtooth", 0.3, 60); },
+  // Hollow metal tubes knocking together: a few pentatonic notes with a metallic overtone, at random moments.
+  windchime: (c, o) => {
+    const notes = [1568, 1760, 2093, 2349, 2637, 3136];
+    for (let i = 0; i < 8; i++) {
+      const f = notes[Math.floor(Math.random() * notes.length)]!;
+      const at = Math.random() * 1.6;
+      tone(c, o, at, f, 1.6, "sine", 0.16);
+      tone(c, o, at, f * 2.76, 0.5, "sine", 0.04);
+    }
+  },
+  // Water droplets: quick rising "plinks".
+  drip: (c, o) => repeat(4, 0.42, (t) => { tone(c, o, t, 700, 0.08, "sine", 0.45, 1900); tone(c, o, t + 0.05, 1400, 0.12, "sine", 0.12, 1100); }),
+  bark: (c, o) => repeat(2, 0.32, (t) => { noise(c, o, t, 0.1, "bandpass", 900, 0.6, 500, 2); tone(c, o, t, 380, 0.14, "sawtooth", 0.3, 170); }),
+  meow: (c, o) => { tone(c, o, 0, 480, 0.28, "sawtooth", 0.14, 820); tone(c, o, 0.26, 820, 0.42, "sawtooth", 0.14, 430); tone(c, o, 0, 480, 0.7, "sine", 0.2, 600); },
+  quack: (c, o) => repeat(3, 0.22, (t) => { tone(c, o, t, 470, 0.14, "sawtooth", 0.22, 300); tone(c, o, t, 940, 0.1, "square", 0.05, 600); }),
 };
 
 // ── Sound settings (remembered per browser) ─────────────────────
@@ -161,6 +176,10 @@ export const sfx = {
   yourTurn: blip((c, o) => [523, 659, 784].forEach((f, i) => tone(c, o, i * 0.09, f, 0.35, "triangle", 0.3))),
   reveal: blip((c, o) => [784, 659].forEach((f, i) => tone(c, o, i * 0.12, f, 0.4, "sine", 0.25))),
   join: blip((c, o) => tone(c, o, 0, 660, 0.12, "sine", 0.2, 990)),
+  hit: blip((c, o) => {
+    noise(c, o, 0, 0.3, "bandpass", 500, 0.7, 2600, 1.2);
+    tone(c, o, 0.04, 320, 0.25, "sawtooth", 0.14, 110);
+  }),
   win: blip((c, o) => [523, 659, 784, 1047, 784, 1047].forEach((f, i) => tone(c, o, i * 0.13, f, i === 5 ? 0.8 : 0.18, "triangle", 0.3))),
 };
 

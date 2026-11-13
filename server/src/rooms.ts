@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import {
   BRUSH_SIZES, CHOOSE_SECONDS, checkName, DEFAULT_SETTINGS, DRAW_COLORS, HINT_BONUS, HINT_PENALTY, HINTS_PER_TURN, INK_BUDGET,
   isCloseGuess, isCorrectGuess, MAX_AI_PLAYERS, MAX_PLAYERS, MIN_PLAYERS_TO_START, MODIFIER_IDS, MODIFIERS, randomAvatar,
-  REVEAL_SECONDS, ROOM_CODE_ALPHABET, ROOM_CODE_LENGTH, ROUND_OPTIONS, SABOTAGES, sanitizeAvatar, TURN_SECONDS_OPTIONS, TWIST_CHANCE,
+  REVEAL_SECONDS, ROOM_CODE_ALPHABET, ROOM_CODE_LENGTH, ROUND_OPTIONS, SABOTAGES, sanitizeAvatar, TURN_SECONDS_OPTIONS, HUGE_BRUSH,
   type AvatarConfig, type FeedItem, type GamePhase, type Hint, type HintKind, type ModifierId, type PrivateGame, type Profile,
   type RoomSettings, type RoomState, type SabotageKind, type Stroke,
 } from "@sketch/shared";
@@ -69,6 +69,9 @@ interface Game {
   turnId: number;
   choosingStartedAt: number;
   bots: BotTurn;
+  /** Upcoming twist slots (true = twist), refilled in pairs. */
+  twistBag: boolean[];
+  lastTwist: ModifierId | null;
 }
 
 /** Per-turn memory for AI players. */
@@ -252,6 +255,8 @@ export class RoomManager {
       turnId: 0,
       choosingStartedAt: 0,
       bots: newBotTurn(),
+      twistBag: [],
+      lastTwist: null,
     };
     room.aiCalls = 0;
     this.feed(room.game, "system", `Round 1 of ${room.settings.rounds}. Good luck!`);
@@ -309,7 +314,7 @@ export class RoomManager {
     g.coins.set(me.id, coins - spec.cost);
     g.sabotagedBy.add(me.id);
     g.sabotage = { kind, until: Date.now() + spec.seconds * 1000, byId: me.id };
-    this.feed(g, "system", `${me.name} used ${spec.name} on the drawer!`);
+    this.feed(g, "system", `${spec.emoji} ${me.name} ${spec.verb}!`);
     this.hooks.changed(room.code);
   }
 
@@ -406,12 +411,13 @@ export class RoomManager {
     if (g.modifier === "limitedInk" && g.inkUsed >= INK_BUDGET) return null;
     const effect = g.sabotage && g.sabotage.until > Date.now() ? g.sabotage.kind : null;
     if (effect === "freeze") return null;
-    const allowed: readonly string[] = g.palette ?? DRAW_COLORS;
+    // Rainbow Pen: the drawer's browser picks a random colour per line, so any palette colour is fine.
+    const allowed: readonly string[] = effect === "rainbow" ? DRAW_COLORS : g.palette ?? DRAW_COLORS;
     const stroke: Stroke = {
       id: raw.id,
       tool: raw.tool === "eraser" && g.modifier !== "oneLine" ? "eraser" : "pen",
       color: allowed.includes(raw.color) ? raw.color : allowed[0]!,
-      size: effect === "tinyBrush" ? BRUSH_SIZES[0] : (BRUSH_SIZES as readonly number[]).includes(raw.size) ? raw.size : BRUSH_SIZES[1],
+      size: effect === "hugeBrush" ? HUGE_BRUSH : (BRUSH_SIZES as readonly number[]).includes(raw.size) ? raw.size : BRUSH_SIZES[1],
       points: cleanPoints(raw.points).slice(0, 2),
     };
     g.strokes.push(stroke);
@@ -592,7 +598,7 @@ export class RoomManager {
     g.choosingStartedAt = Date.now();
     g.bots = newBotTurn();
     // Twist roll: shown during the choosing phase as a slot machine.
-    g.modifier = room.settings.twists && Math.random() < TWIST_CHANCE ? MODIFIER_IDS[Math.floor(Math.random() * MODIFIER_IDS.length)]! : null;
+    g.modifier = room.settings.twists ? this.rollTwist(g) : null;
     g.palette = g.modifier === "threeColors" ? [...DRAW_COLORS].sort(() => Math.random() - 0.5).slice(0, 3) : null;
     g.endsAt = Date.now() + CHOOSE_SECONDS * 1000;
     this.feed(g, "system", `${drawer.name} is choosing a word.`);
@@ -600,6 +606,18 @@ export class RoomManager {
     this.hooks.canvasReset(room.code);
     this.hooks.privateChanged(room.code);
     this.hooks.changed(room.code);
+  }
+
+  /**
+   * Exactly half the turns get a twist: every pair of turns holds one twisted and one plain turn, in random order.
+   * The same twist never comes up twice in a row.
+   */
+  private rollTwist(g: Game): ModifierId | null {
+    if (g.twistBag.length === 0) g.twistBag = Math.random() < 0.5 ? [true, false] : [false, true];
+    if (!g.twistBag.shift()) return null;
+    const options = MODIFIER_IDS.filter((m) => m !== g.lastTwist);
+    g.lastTwist = options[Math.floor(Math.random() * options.length)]!;
+    return g.lastTwist;
   }
 
   private beginDrawing(room: Room, entry: WordEntry) {

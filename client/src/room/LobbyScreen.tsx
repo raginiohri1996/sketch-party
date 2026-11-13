@@ -95,6 +95,7 @@ export function LobbyScreen({ room, myId, api, online }: Props) {
           </ul>
         </section>
 
+        {isHost ? (
         <section className="glass glass--frost settings" aria-label="Game settings">
           <div className="settings__head">
             <h2 className="settings__title">Game settings</h2>
@@ -168,6 +169,9 @@ export function LobbyScreen({ room, myId, api, online }: Props) {
             )}
           </div>
         </section>
+        ) : (
+          <WaitingPanel room={room} />
+        )}
       </main>
     </div>
   );
@@ -210,5 +214,22 @@ function Toggle({ label, hint, value, disabled, onChange }: { label: string; hin
         <span className="switch__knob" />
       </button>
     </div>
+  );
+}
+
+/** What people who joined see instead of the settings: who's hosting and what happens next. */
+function WaitingPanel({ room }: { room: RoomState }) {
+  const host = room.players.find((p) => p.isHost);
+  return (
+    <section className="glass glass--frost waitroom" aria-label="Waiting for the host">
+      {host && <Avatar config={host.avatar} crop="bust" className="waitroom__avatar" title={host.name} />}
+      <h2 className="waitroom__title">Waiting for {host?.name ?? "the host"} to start</h2>
+      <p className="waitroom__sub">
+        You're in! The host picks the rules and starts the game. Each round, everyone draws once and guesses the rest.
+      </p>
+      <p className="waiting">
+        <Emoji name="Hourglass not done" size={18} /> Hang tight…
+      </p>
+    </section>
   );
 }

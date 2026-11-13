@@ -71,6 +71,7 @@ export const SOUND_IDS = [
   "ring", "beep", "ding", "tick", "buzz", "whoosh", "splash", "engine", "siren", "pop", "chime", "drum", "pluck",
   "piano", "thunder", "rain", "heartbeat", "click", "typing", "whistle", "laser", "trumpet", "boing", "honk",
   "chirp", "hoot", "croak", "crunch", "sizzle", "pour", "bubble", "hiss", "knock", "jingle", "roar",
+  "windchime", "drip", "bark", "meow", "quack",
 ] as const;
 export type SoundId = (typeof SOUND_IDS)[number];
 
@@ -87,19 +88,25 @@ export const MODIFIERS: Record<ModifierId, { name: string; rule: string; emoji: 
   speed: { name: "Speed Round", rule: "Half the time, double the points.", emoji: "⚡" },
 };
 export const MODIFIER_IDS = Object.keys(MODIFIERS) as ModifierId[];
-/** Chance that a turn gets a twist when twists are on. */
+/** Share of turns that get a twist when twists are on (the server deals them out evenly, one per pair of turns). */
 export const TWIST_CHANCE = 0.5;
 /** Ink budget for "Limited Ink", in canvas widths of line. */
 export const INK_BUDGET = 4.5;
 
 // ── Sabotage ─────────────────────────────────────────────────
 
-export type SabotageKind = "splat" | "tinyBrush" | "freeze";
-export const SABOTAGES: Record<SabotageKind, { name: string; cost: number; seconds: number; emoji: string; desc: string }> = {
-  tinyBrush: { name: "Tiny Brush", cost: 1, seconds: 10, emoji: "🪡", desc: "Smallest brush for 10s" },
-  splat: { name: "Ink Splat", cost: 2, seconds: 8, emoji: "💦", desc: "Blots the drawer's view for 8s" },
-  freeze: { name: "Freeze", cost: 3, seconds: 3, emoji: "🧊", desc: "Drawer can't draw for 3s" },
+export type SabotageKind = "holi" | "hugeBrush" | "freeze" | "earthquake" | "upsideDown" | "fog" | "rainbow";
+export const SABOTAGES: Record<SabotageKind, { name: string; cost: number; seconds: number; emoji: string; desc: string; verb: string }> = {
+  fog: { name: "Fog", cost: 1, seconds: 8, emoji: "🌫️", desc: "Fogs up the drawer's view for 8s", verb: "rolled fog over the drawer" },
+  hugeBrush: { name: "Huge Brush", cost: 1, seconds: 10, emoji: "🖌️", desc: "A fat marker for 10s", verb: "swapped the drawer's pen for a huge brush" },
+  rainbow: { name: "Rainbow Pen", cost: 1, seconds: 10, emoji: "🌈", desc: "Random colour every line for 10s", verb: "gave the drawer a rainbow pen" },
+  holi: { name: "Holi Splash", cost: 2, seconds: 8, emoji: "🎨", desc: "Colour powder all over the drawer's screen", verb: "threw Holi colours at the drawer" },
+  earthquake: { name: "Earthquake", cost: 2, seconds: 6, emoji: "🫨", desc: "Shakes the canvas for 6s", verb: "set off an earthquake" },
+  upsideDown: { name: "Upside Down", cost: 3, seconds: 8, emoji: "🙃", desc: "Flips the drawer's canvas for 8s", verb: "flipped the drawer's canvas upside down" },
+  freeze: { name: "Freeze", cost: 3, seconds: 3, emoji: "🧊", desc: "Drawer can't draw for 3s", verb: "froze the drawer" },
 };
+/** Brush size forced by the Huge Brush sabotage. */
+export const HUGE_BRUSH = 46;
 export const SABOTAGE_KINDS = Object.keys(SABOTAGES) as SabotageKind[];
 
 export type Tool = "pen" | "eraser";
